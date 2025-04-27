@@ -2,6 +2,7 @@
   "name": "website-editor",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://vadim_bk.github.io/website-editor",
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
