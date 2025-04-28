@@ -7,22 +7,15 @@ const COLUMN_TYPES = [
   {
     type: StageColumnContentType.Text,
     icon: <Icons.Text />,
-    label: "Text",
   },
   {
     type: StageColumnContentType.Image,
     icon: <Icons.Image />,
-    label: "Image",
-  },
-  {
-    type: StageColumnContentType.Video,
-    icon: <Icons.Image />,
-    label: "Video",
   },
 ];
 
 type Props = {
-  type: StageColumnContentType;
+  type: StageColumnContentType | null;
   onTypeChange: (values: Partial<StageColumn>) => void;
 };
 
@@ -38,19 +31,22 @@ export const ColumnSection = ({ type, onTypeChange }: Props) => {
 
   return (
     <div className="section">
-      <div className="section-header">Type</div>
+      <div className="section-header">Column</div>
 
-      <div className="column-types">
-        {COLUMN_TYPES.map((columnType) => (
-          <button
-            key={columnType.type}
-            className={classNames("column-type", { selected: columnType.type === type })}
-            onClick={handleTypeChange(columnType.type)}
-          >
-            <span className="column-type-icon">{columnType.icon}</span>
-            <span className="column-type-label">{columnType.label}</span>
-          </button>
-        ))}
+      <div className="button-group-field">
+        <label>Contents</label>
+
+        <div className="button-group">
+          {COLUMN_TYPES.map((columnType) => (
+            <button
+              key={columnType.type}
+              className={classNames({ selected: columnType.type === type })}
+              onClick={handleTypeChange(columnType.type)}
+            >
+              {columnType.icon}
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   );

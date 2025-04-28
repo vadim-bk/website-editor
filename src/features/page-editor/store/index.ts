@@ -1,27 +1,19 @@
 import { create } from "zustand";
 import { LOCAL_STORAGE_KEYS } from "shared/constant";
 import { persist } from "zustand/middleware";
-import {
-  StageColumn,
-  StageColumnContentType,
-  StageColumnAlignment,
-  StageRow,
-  TextColumn,
-  ImageColumn,
-  VideoColumn,
-} from "../types";
+import { StageColumn, StageColumnContentType, StageColumnAlignment, StageRow } from "../types";
 import { v4 as uuidv4 } from "uuid";
-
-const createDefaultTextColumn = (id: string): TextColumn => ({
-  id,
-  type: StageColumnContentType.Text,
-  text: "# Untitled",
-  textAlign: StageColumnAlignment.Center,
-});
 
 const DEFAULT_ROW: StageRow = {
   id: uuidv4(),
-  columns: [createDefaultTextColumn(uuidv4())],
+  columns: [
+    {
+      id: uuidv4(),
+      type: StageColumnContentType.Text,
+      text: "# Untitled",
+      textAlign: StageColumnAlignment.Center,
+    },
+  ],
 };
 
 type EditorState = {
@@ -33,34 +25,6 @@ type EditorActions = {
   addColumn: (rowId: string, id: string) => void;
   getColumnById: (rowId: string | null, id: string | null) => StageColumn | undefined;
   updateColumn: (rowId: string, columnId: string, values: Partial<StageColumn>) => void;
-};
-
-const createEmptyColumn = (id: string, type: StageColumnContentType): StageColumn => {
-  switch (type) {
-    case StageColumnContentType.Text:
-      return {
-        id,
-        type,
-        text: "",
-        textAlign: StageColumnAlignment.Left,
-      };
-    case StageColumnContentType.Image:
-      return {
-        id,
-        type,
-        imageUrl: "",
-        altText: "",
-      };
-    case StageColumnContentType.Video:
-      return {
-        id,
-        type,
-        videoUrl: "",
-        autoplay: false,
-      };
-    default:
-      return createDefaultTextColumn(id);
-  }
 };
 
 export const useEditorStore = create<EditorState & EditorActions>()(
@@ -79,7 +43,7 @@ export const useEditorStore = create<EditorState & EditorActions>()(
         set((state) => ({
           rows: state.rows.map((row) => {
             if (row.id === rowId) {
-              return { ...row, columns: [...row.columns, createDefaultTextColumn(id)] };
+              return { ...row, columns: [...row.columns, { id, type: null }] };
             }
 
             return row;
@@ -88,37 +52,41 @@ export const useEditorStore = create<EditorState & EditorActions>()(
 
       updateColumn: (rowId, columnId, values) =>
         set((state) => {
-          const newRows = state.rows.map((row) => {
+          const rows = state.rows.map((row) => {
             if (row.id !== rowId) return row;
 
-            const newColumns = row.columns.map((column) => {
+            const columns = row.columns.map((column) => {
               if (column.id !== columnId) return column;
 
-              if ("type" in values && values.type && values.type !== column.type) {
-                return createEmptyColumn(column.id, values.type);
+              // If type is changing, set the appropriate defaults
+              if (values.type && values.type !== column.type) {
+                if (values.type === StageColumnContentType.Text) {
+                  return {
+                    id: column.id,
+                    type: StageColumnContentType.Text,
+                    text: "",
+                    textAlign: StageColumnAlignment.Left,
+                  } as StageColumn;
+                }
+                if (values.type === StageColumnContentType.Image) {
+                  return {
+                    id: column.id,
+                    type: StageColumnContentType.Image,
+                    imageUrl: "",
+                    altText: "",
+                  } as StageColumn;
+                }
+                return { id: column.id, type: null } as StageColumn;
               }
 
-              if (column.type === StageColumnContentType.Text) {
-                if ("text" in values || "textAlign" in values) {
-                  return { ...column, ...values } as TextColumn;
-                }
-              } else if (column.type === StageColumnContentType.Image) {
-                if ("imageUrl" in values || "altText" in values) {
-                  return { ...column, ...values } as ImageColumn;
-                }
-              } else if (column.type === StageColumnContentType.Video) {
-                if ("videoUrl" in values || "autoplay" in values) {
-                  return { ...column, ...values } as VideoColumn;
-                }
-              }
-
-              return column;
+              // Simple merge of values
+              return { ...column, ...values } as StageColumn;
             });
 
-            return { ...row, columns: newColumns };
+            return { ...row, columns };
           });
 
-          return { rows: newRows };
+          return { rows };
         }),
     }),
     {

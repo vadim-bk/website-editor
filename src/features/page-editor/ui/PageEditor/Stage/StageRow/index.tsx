@@ -12,7 +12,7 @@ type Props = {
 
 export const StageRow = ({ columns, isSelected, selectedColumnId, onSelect }: Props) => {
   const handleColumnSelect = useCallback(
-    (columnId: string) => () => {
+    (columnId: string | undefined) => () => {
       onSelect(columnId);
     },
     [onSelect]
@@ -24,7 +24,7 @@ export const StageRow = ({ columns, isSelected, selectedColumnId, onSelect }: Pr
         <Column
           key={column.id}
           selected={selectedColumnId === column.id}
-          onSelect={handleColumnSelect(column.id)}
+          onSelect={handleColumnSelect(column?.id)}
           data-testid="column"
         >
           <ColumnContent column={column} />

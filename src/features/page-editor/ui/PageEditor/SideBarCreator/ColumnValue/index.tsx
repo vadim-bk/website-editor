@@ -16,14 +16,5 @@ export const ColumnValue = ({ column, onChange }: Props) => {
     return <ImageSection column={column} onChange={onChange} />;
   }
 
-  if (column.type === StageColumnContentType.Video) {
-    return (
-      <div className="section">
-        <div className="section-header">Video</div>
-        <div className="info-message">Video editing is not yet implemented</div>
-      </div>
-    );
-  }
-
   return null;
 };

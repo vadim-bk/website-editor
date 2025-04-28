@@ -1,7 +1,6 @@
 export enum StageColumnContentType {
   Text = "text",
   Image = "image",
-  Video = "video",
 }
 
 export enum StageColumnAlignment {
@@ -12,7 +11,12 @@ export enum StageColumnAlignment {
 
 export type BaseColumn = {
   id: string;
-  type: StageColumnContentType;
+  type: StageColumnContentType | null;
+};
+
+export type EmptyColumn = {
+  id: string;
+  type: null;
 };
 
 export type TextColumn = BaseColumn & {
@@ -27,13 +31,7 @@ export type ImageColumn = BaseColumn & {
   altText: string;
 };
 
-export type VideoColumn = BaseColumn & {
-  type: StageColumnContentType.Video;
-  videoUrl: string;
-  autoplay: boolean;
-};
-
-export type StageColumn = TextColumn | ImageColumn | VideoColumn;
+export type StageColumn = TextColumn | ImageColumn | EmptyColumn;
 
 export type StageRow = {
   id: string;

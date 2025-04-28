@@ -15,9 +15,5 @@ export const ColumnContent = ({ column }: Props) => {
     return <ImageContent column={column} />;
   }
 
-  if (column.type === StageColumnContentType.Video) {
-    return <div>Video content (not implemented yet)</div>;
-  }
-
-  return <div>Unsupported content type</div>;
+  return null;
 };
